@@ -1,22 +1,22 @@
 version: '3.8'
 
 services:
-  influence-monkey:
+  virus-project:
     build: .
-    container_name: influence_api
+    container_name: virus-project
     ports:
       - "3000:3000"
     environment:
       PORT: 3000
-      MONGO_URL: mongodb://root:root@mongo_new:27017/
+      MONGO_URL: mongodb://root:root@mongo_bdd:27017/
     depends_on:
-      - mongo_new
+      - mongo_bdd
     networks:
       - app-network
 
-  mongo_new:
+  mongo_bdd:
     image: mongo
-    container_name: mongo_new
+    container_name: mongo_bdd
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
