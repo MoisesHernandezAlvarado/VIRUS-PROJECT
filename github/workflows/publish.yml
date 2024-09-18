@@ -25,3 +25,4 @@ jobs:
         run: | 
           docker push moiseshernandezalvarado/virus-mpox:${{ github.sha }}
           docker push moiseshernandezalvarado/virus-mpox:latest
+        ###
