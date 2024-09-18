@@ -28,8 +28,8 @@ export const emailJob = () => {
                         );
 
                         await emailService.sendEmail({
-                            to: "moiseshernandezalvarado@hotmail.com.com",
-                            subject: `Nuevo caso de viruela del mono`,
+                            to: "moiseshernandezalvarado@hotmail.com",
+                            subject: `MPOX CASE`,
                             htmlBody: htmlBody,
                         });
 

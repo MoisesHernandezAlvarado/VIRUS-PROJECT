@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { InfectionModel } from '../../../data/models/infection.model';
+import { endOfDay, startOfDay, subDays } from 'date-fns';
+
 
 export class InfectionController {
     public getInfections = async (req: Request, res: Response) => {
@@ -13,17 +15,29 @@ export class InfectionController {
 
     public getInfectionsLastWeek = async (req: Request, res: Response) => {
         try {
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            // Obtener la fecha y hora actual en UTC
+            const now = new Date();
+            const utcToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    
+            const sevenDaysAgo = subDays(startOfDay(utcToday), 7);
 
-            const infections = await InfectionModel.find({ creationDate: { $gte: oneWeekAgo } });
-            return res.json(infections);
+            const infections = await InfectionModel.find({
+                creationDate: {
+                    $gte: sevenDaysAgo
+                }
+            });
+    
+            if (infections.length === 0) {
+                return res.status(404).json({ message: "No se encontraron casos en la última semana." });
+            }
+    
+            return res.json({ data: infections });
         } catch (error) {
+            console.error('Error al obtener los casos de la última semana:', error);
             return res.status(500).json({ message: "Error al obtener los casos de la última semana" });
         }
     }
-
-
+    
     public createInfection = async (req: Request, res: Response) => {
         try {
             const { lat, lng, genre, age } = req.body;
@@ -68,7 +82,7 @@ export class InfectionController {
             const updatedInfection = await InfectionModel.findByIdAndUpdate(
                 id,
                 { lat, lng, genre, age, isSent },
-                { new: true, runValidators: true } // Agrega `runValidators: true` para validar los datos durante la actualización
+                { new: true, runValidators: true } 
             );
     
             if (!updatedInfection) {
