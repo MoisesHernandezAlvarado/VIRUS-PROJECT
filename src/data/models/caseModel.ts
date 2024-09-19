@@ -27,4 +27,4 @@ const infectionSchema = new mongoose.Schema({
     }
 });
 
-export const InfectionModel = mongoose.model("Infection", infectionSchema);
+export const InfectionMpox = mongoose.model("Infection", infectionSchema);

@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { InfectionModel } from '../../../data/models/infection.model';
+import { InfectionMpox } from '../../../data/models/caseModel';
 import { endOfDay, startOfDay, subDays } from 'date-fns';
 
-export class InfectionController {
+export class InfectionCase {
   
     // Endpoint para obtener todos los casos de infecciones
-    public listAllInfections = async (req: Request, res: Response) => {
+    public listAllCases = async (req: Request, res: Response) => {
         try {
-            const infections = await InfectionModel.find();
+            const infections = await InfectionMpox.find();
             return res.json(infections);
         } catch (error) {
             return res.status(500).json({ message: "Error retrieving infections" });
@@ -15,13 +15,13 @@ export class InfectionController {
     }
 
     // Endpoint para obtener infecciones de la última semana
-    public listInfectionsFromLastWeek = async (req: Request, res: Response) => {
+    public listCasesFromLastWeek = async (req: Request, res: Response) => {
         try {
             const now = new Date();
             const utcToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
             const sevenDaysAgo = subDays(startOfDay(utcToday), 7);
 
-            const infections = await InfectionModel.find({
+            const infections = await InfectionMpox.find({
                 creationDate: {
                     $gte: sevenDaysAgo
                 }
@@ -39,10 +39,10 @@ export class InfectionController {
     }
 
     // Endpoint para crear un nuevo caso de infección
-    public registerInfection = async (req: Request, res: Response) => {
+    public registerCase = async (req: Request, res: Response) => {
         try {
             const { lat, lng, genre, age } = req.body;
-            const newInfection = await InfectionModel.create({
+            const newInfection = await InfectionMpox.create({
                 lat,
                 lng,
                 genre,
@@ -60,10 +60,10 @@ export class InfectionController {
     }
 
     // Endpoint para obtener un caso de infección por ID
-    public findInfectionById = async (req: Request, res: Response) => {
+    public findCaseById = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const infection = await InfectionModel.findById(id);
+            const infection = await InfectionMpox.findById(id);
             if (!infection) {
                 return res.status(404).json({ message: "Infection not found" });
             }
@@ -74,12 +74,12 @@ export class InfectionController {
     }
 
     // Endpoint para actualizar un caso de infección
-    public modifyInfection = async (req: Request, res: Response) => {
+    public modifyCase = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
             const { lat, lng, genre, age, isSent } = req.body;
     
-            const updatedInfection = await InfectionModel.findByIdAndUpdate(
+            const updatedInfection = await InfectionMpox.findByIdAndUpdate(
                 id,
                 { lat, lng, genre, age, isSent },
                 { new: true, runValidators: true }
@@ -99,10 +99,10 @@ export class InfectionController {
     }
 
     // Endpoint para eliminar un caso de infección
-    public removeInfection = async (req: Request, res: Response) => {
+    public removeCase = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const infection = await InfectionModel.findByIdAndDelete(id);
+            const infection = await InfectionMpox.findByIdAndDelete(id);
 
             if (!infection) {
                 return res.status(404).json({ message: "Infection not found" });

@@ -2,8 +2,8 @@ import express from "express";
 import 'dotenv/config'
 import { envs } from "./config/envs.plugin";
 import { MongoDatabase } from "./data/init";
-import { InfectionModel } from "./data/models/infection.model";
-import { AppRoutes } from "./presentation/controllers/routes";
+import { InfectionMpox } from "./data/models/caseModel";
+import { AppRoutes } from "./presentation/controllers/routes-central";
 import { emailJob } from "./domain/jobs/email.jobs";
 
 
@@ -24,7 +24,7 @@ app.get("/", (req, res)=>{
 
 app.post("/", async (req, res) => {
     const { title, description, lat, lng } = req.body
-    const newIncident = await InfectionModel.create({
+    const newIncident = await InfectionMpox.create({
         title,
         description,
         lat,
