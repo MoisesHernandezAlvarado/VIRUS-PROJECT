@@ -2,23 +2,23 @@ import { Request, Response } from 'express';
 import { InfectionModel } from '../../../data/models/infection.model';
 import { endOfDay, startOfDay, subDays } from 'date-fns';
 
-
 export class InfectionController {
-    public getInfections = async (req: Request, res: Response) => {
+  
+    // Endpoint para obtener todos los casos de infecciones
+    public listAllInfections = async (req: Request, res: Response) => {
         try {
             const infections = await InfectionModel.find();
             return res.json(infections);
         } catch (error) {
-            return res.status(500).json({ message: "Error al obtener los casos" });
+            return res.status(500).json({ message: "Error retrieving infections" });
         }
     }
 
-    public getInfectionsLastWeek = async (req: Request, res: Response) => {
+    // Endpoint para obtener infecciones de la última semana
+    public listInfectionsFromLastWeek = async (req: Request, res: Response) => {
         try {
-            // Obtener la fecha y hora actual en UTC
             const now = new Date();
             const utcToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    
             const sevenDaysAgo = subDays(startOfDay(utcToday), 7);
 
             const infections = await InfectionModel.find({
@@ -28,17 +28,18 @@ export class InfectionController {
             });
     
             if (infections.length === 0) {
-                return res.status(404).json({ message: "No se encontraron casos en la última semana." });
+                return res.status(404).json({ message: "No infections found in the last week" });
             }
     
             return res.json({ data: infections });
         } catch (error) {
-            console.error('Error al obtener los casos de la última semana:', error);
-            return res.status(500).json({ message: "Error al obtener los casos de la última semana" });
+            console.error('Error retrieving infections from last week:', error);
+            return res.status(500).json({ message: "Error retrieving infections from last week" });
         }
     }
-    
-    public createInfection = async (req: Request, res: Response) => {
+
+    // Endpoint para crear un nuevo caso de infección
+    public registerInfection = async (req: Request, res: Response) => {
         try {
             const { lat, lng, genre, age } = req.body;
             const newInfection = await InfectionModel.create({
@@ -50,31 +51,30 @@ export class InfectionController {
                 isSent: false
             });
             res.json(newInfection);
-        } catch (error:any) {
+        } catch (error: any) {
             if (error.name === 'ValidationError') {
-
-                return res.status(400).json({ message: "Datos inválidos: " + error.message });
+                return res.status(400).json({ message: "Invalid data: " + error.message });
             }
-            return res.status(500).json({ message: "Error al crear el caso" });
+            return res.status(500).json({ message: "Error registering the infection" });
         }
-    }  
+    }
 
-  
-    public getInfectionById = async (req: Request, res: Response) => {
+    // Endpoint para obtener un caso de infección por ID
+    public findInfectionById = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
             const infection = await InfectionModel.findById(id);
             if (!infection) {
-                return res.status(404).json({ message: "Caso no encontrado" });
+                return res.status(404).json({ message: "Infection not found" });
             }
             return res.json(infection);
         } catch (error) {
-            return res.status(500).json({ message: "Error al obtener el caso" });
+            return res.status(500).json({ message: "Error retrieving the infection" });
         }
     }
 
-    
-    public updateInfection = async (req: Request, res: Response) => {
+    // Endpoint para actualizar un caso de infección
+    public modifyInfection = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
             const { lat, lng, genre, age, isSent } = req.body;
@@ -82,34 +82,34 @@ export class InfectionController {
             const updatedInfection = await InfectionModel.findByIdAndUpdate(
                 id,
                 { lat, lng, genre, age, isSent },
-                { new: true, runValidators: true } 
+                { new: true, runValidators: true }
             );
     
             if (!updatedInfection) {
-                return res.status(404).json({ message: "Caso no encontrado" });
+                return res.status(404).json({ message: "Infection not found" });
             }
     
             return res.json(updatedInfection);
-        } catch (error:any) {
+        } catch (error: any) {
             if (error.name === 'ValidationError') {
-                return res.status(400).json({ message: "Datos inválidos: " + error.message });
+                return res.status(400).json({ message: "Invalid data: " + error.message });
             }
-            return res.status(500).json({ message: "Error al actualizar el caso" });
+            return res.status(500).json({ message: "Error updating the infection" });
         }
     }
 
-    
-    public deleteInfection = async (req: Request, res: Response) => {
+    // Endpoint para eliminar un caso de infección
+    public removeInfection = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
             const infection = await InfectionModel.findByIdAndDelete(id);
 
             if (!infection) {
-                return res.status(404).json({ message: "Caso no encontrado" });
+                return res.status(404).json({ message: "Infection not found" });
             }
-            return res.json({ message: "Caso eliminado" });
+            return res.json({ message: "Infection removed successfully" });
         } catch (error) {
-            return res.status(500).json({ message: "Error al eliminar el caso" });
+            return res.status(500).json({ message: "Error removing the infection" });
         }
     }
 }
